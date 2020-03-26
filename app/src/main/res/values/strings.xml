@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">COVIT-19 Tracker</string>
+
+    <string name="population_count_format">人口: %1$d</string>
+    <string name="confirmed_count_format">感染者数: %1$d</string>
+    <string name="deaths_count_format">死者数: %1$d</string>
+    <string name="recovered_count_format">回復者数: %1$d</string>
+</resources>

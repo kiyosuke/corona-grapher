@@ -1,0 +1,25 @@
+import dependencies.Dep
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply from: rootProject.file('gradle/android.gradle')
+
+dependencies {
+    implementation project(':data:api')
+    implementation project(':common')
+
+    implementation Dep.AndroidX.Room.runtime
+    implementation Dep.AndroidX.Room.ktx
+    kapt Dep.AndroidX.Room.compiler
+
+    implementation Dep.Kotlin.stdlib
+    implementation Dep.Kotlin.Coroutines.core
+    implementation Dep.Kotlin.Coroutines.android
+
+    implementation Dep.ThreeTenAbp.core
+
+    implementation Dep.Koin.core
+}

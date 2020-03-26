@@ -1,0 +1,33 @@
+import dependencies.Dep
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+apply from: rootProject.file('gradle/android.gradle')
+
+android {
+    defaultConfig {
+        buildConfigField "String", "API_ENDPOINT", "\"https://coronavirus-tracker-api.herokuapp.com/v2/\""
+    }
+}
+
+dependencies {
+    implementation project(':common')
+
+    implementation Dep.Kotlin.stdlib
+    implementation Dep.Kotlin.Coroutines.core
+    implementation Dep.Kotlin.Coroutines.android
+
+    implementation Dep.OkHttp.core
+
+    implementation Dep.Retrofit.core
+    implementation Dep.Retrofit.moshi
+
+    implementation Dep.Moshi.core
+    implementation Dep.Moshi.kotlin
+
+    implementation Dep.ThreeTenAbp.core
+
+    implementation Dep.Koin.core
+}
