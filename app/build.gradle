@@ -21,6 +21,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            resValue("string", "google_map_api_key", "AIzaSyDImU_xlYq0TjrRIkOW4-_2G6rQ3B3WrnE")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -63,6 +66,9 @@ dependencies {
 
     implementation Dep.AndroidX.Navigation.fragmentKtx
     implementation Dep.AndroidX.Navigation.uiKtx
+
+    implementation Dep.GoogleMaps.maps
+    implementation Dep.GoogleMaps.utils
 
     implementation Dep.ThreeTenAbp.core
     implementation Dep.Timber.core

@@ -1,34 +1,37 @@
 package com.kiyosuke.corona_grapher.ui.locations.detail
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-
+import androidx.fragment.app.Fragment
 import com.kiyosuke.corona_grapher.R
-import com.kiyosuke.corona_grapher.model.LocationId
+import com.kiyosuke.corona_grapher.databinding.LocationDetailFragmentBinding
+import com.kiyosuke.corona_grapher.util.ext.dataBinding
 
-class LocationDetailFragment : Fragment() {
+class LocationDetailFragment : Fragment(R.layout.location_detail_fragment) {
+
+    private val binding: LocationDetailFragmentBinding by dataBinding()
 
     companion object {
-        fun newInstance(locationId: LocationId) = LocationDetailFragment()
+        private const val KEY_ARGS =
+            "com.kiyosuke.corona_grapher.ui.locations.detail.LocationDetailFragment.args"
+
+        fun newInstance(args: LocationDetailArgs) = LocationDetailFragment().apply {
+            arguments = Bundle().apply {
+                putBundle(KEY_ARGS, args.toBundle())
+            }
+        }
     }
 
-    private lateinit var viewModel: LocationDetailViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.location_detail_fragment, container, false)
+    private fun requireArgs(): LocationDetailArgs {
+        val args = requireArguments().getBundle(KEY_ARGS)?.let { args ->
+            LocationDetailArgs.fromBundle(args)
+        }
+        return requireNotNull(args)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(LocationDetailViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+
+    }
 }
