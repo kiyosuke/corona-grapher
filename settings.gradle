@@ -1,2 +1,3 @@
 include ':app', ':data:api', ':data:db', ':data:repository', ':model', ':common'
 rootProject.name='corona-grapher'
+include ':data:memory'
