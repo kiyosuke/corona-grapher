@@ -5,15 +5,14 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -31,6 +30,7 @@ import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
 import com.kiyosuke.corona_grapher.model.*
 import com.kiyosuke.corona_grapher.util.color.Color
 import com.kiyosuke.corona_grapher.util.ext.dataBinding
+import com.kiyosuke.corona_grapher.util.ext.getColorCompat
 import com.kiyosuke.corona_grapher.util.ext.observeNonNull
 import com.kiyosuke.corona_grapher.util.ext.toLatLng
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -38,6 +38,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.abs
 import kotlin.math.max
 
+@ExperimentalStdlibApi
 class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener {
 
@@ -59,6 +60,9 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
 
         val mapFragment = requireMapFragment()
         mapFragment.getMapAsync(this)
+
+        setupLineChart()
+        setupBarChart()
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
 
@@ -101,7 +105,7 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         }
 
         viewModel.locationDetail.observeNonNull(viewLifecycleOwner) { state ->
-            updateSheetTimelineChart(state)
+            updateSheetCharts(state)
         }
 
         viewModel.message.observeNonNull(viewLifecycleOwner) { message ->
@@ -109,6 +113,16 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         }
 
         viewModel.refresh()
+    }
+
+    private fun setupLineChart() {
+        binding.timelineChart.description.isEnabled = false
+        binding.timelineChart.setPinchZoom(true)
+        binding.timelineChart.setScaleEnabled(true)
+    }
+
+    private fun setupBarChart() {
+        binding.timelineBarChart.description.isEnabled = false
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -162,7 +176,12 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
 
         // Bitmapに変換するために描画する必要あり
         circleView.circleFrame.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        circleView.circleFrame.layout(0, 0, circleView.circleFrame.measuredWidth, circleView.circleFrame.measuredHeight)
+        circleView.circleFrame.layout(
+            0,
+            0,
+            circleView.circleFrame.measuredWidth,
+            circleView.circleFrame.measuredHeight
+        )
 
         return circleView.circleFrame.drawToBitmap()
     }
@@ -174,26 +193,35 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         binding.textRecoveredCount.text = location.latest.recovered.toString()
     }
 
-    private fun updateSheetTimelineChart(state: LoadState<Location.Detail>) {
+    private fun updateSheetCharts(state: LoadState<Location.Detail>) {
         if (state.isLoading) {
             binding.timelineChart.clear()
+            binding.timelineBarChart.clear()
         }
         binding.detailProgressbar.isVisible = state.isLoading
-        binding.timelineChart.isVisible = state.isLoading.not()
+        binding.nestedScrollView.isVisible = state.isLoading.not()
 
-        val timelines = state.getValueOrNull()?.timelines ?: return
-        val confirmedSet = LineDataSet(createEntries(timelines.confirmed), getString(R.string.confirmed_count)).apply {
-            this.color = ContextCompat.getColor(requireContext(), R.color.confirmed)
-            setDrawCircles(false)
-        }
-        val deathsSet = LineDataSet(createEntries(timelines.deaths), getString(R.string.deaths_count)).apply {
-            this.color = ContextCompat.getColor(requireContext(), R.color.deaths)
-            setDrawCircles(false)
-        }
-        val recoveredSet = LineDataSet(createEntries(timelines.recovered), getString(R.string.recovered_count)).apply {
-            this.color = ContextCompat.getColor(requireContext(), R.color.recovered)
-            setDrawCircles(false)
-        }
+        val detail = state.getValueOrNull() ?: return
+        updateTimelineChart(detail.timelines)
+        updateTimelineBarChart(detail.timelines.confirmed)
+    }
+
+    private fun updateTimelineChart(timelines: Timelines) {
+        val confirmedSet = createLineSet(
+            createTimelineEntries(timelines.confirmed),
+            getString(R.string.confirmed_count),
+            getColor(R.color.confirmed)
+        )
+        val deathsSet = createLineSet(
+            createTimelineEntries(timelines.deaths),
+            getString(R.string.deaths_count),
+            getColor(R.color.deaths)
+        )
+        val recoveredSet = createLineSet(
+            createTimelineEntries(timelines.recovered),
+            getString(R.string.recovered_count),
+            getColor(R.color.recovered)
+        )
         val lineData = LineData(confirmedSet, deathsSet, recoveredSet)
 
         // X軸の日付生成
@@ -202,20 +230,30 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         }
         binding.timelineChart.xAxis.valueFormatter = IndexAxisValueFormatter(dates)
 
-        binding.timelineChart.description = null
-        binding.timelineChart.setPinchZoom(true)
-        binding.timelineChart.setScaleEnabled(true)
         binding.timelineChart.data = lineData
         binding.timelineChart.invalidate()
     }
 
-    private fun createEntries(timeline: Timeline): List<Entry> {
+    private fun createTimelineEntries(timeline: Timeline): List<Entry> {
         val result = mutableListOf<Entry>()
         timeline.timeline.values.forEachIndexed { index, l ->
             result += Entry(index.toFloat(), l.toFloat())
         }
         return result
     }
+
+    private fun createLineSet(entries: List<Entry>, label: String, color: Int): LineDataSet {
+        return LineDataSet(entries, label).apply {
+            this.color = color
+            setDrawCircles(false)
+        }
+    }
+
+    private fun updateTimelineBarChart(timeline: Timeline) {
+
+    }
+
+    private fun getColor(@ColorRes resId: Int) = requireContext().getColorCompat(resId)
 
     override fun onMarkerClick(marker: Marker): Boolean {
         viewModel.onClickedMarker(marker)

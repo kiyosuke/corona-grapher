@@ -9,6 +9,7 @@
 
     <color name="darkTextColor">#88000000</color>
 
+    <color name="healthy">#4169E1</color>
     <color name="confirmed">#FFA500</color>
     <color name="recovered">#66CDAA</color>
     <color name="deaths">#DC143C</color>

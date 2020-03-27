@@ -48,7 +48,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom_sheet"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@drawable/sheet_background"
                 android:elevation="8dp"
                 app:behavior_hideable="true"
@@ -71,15 +71,34 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/timeline_chart"
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_view"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="@dimen/bottom_sheet_peek_height"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/bottom_sheet_peek_height"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/timeline_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/graph_height" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/timeline_bar_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/graph_height"/>
+
+                    </LinearLayout>
+
+                </androidx.core.widget.NestedScrollView>
 
                 <TextView
                     android:id="@+id/text_country"
