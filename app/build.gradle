@@ -56,6 +56,8 @@ dependencies {
     implementation Dep.AndroidX.appcompat
     implementation Dep.AndroidX.coreKtx
     implementation Dep.AndroidX.constraintLayout
+    implementation Dep.AndroidX.coordinatorLayout
+    implementation Dep.AndroidX.materialComponent
     implementation Dep.AndroidX.recyclerView
     implementation Dep.Groupie.core
     implementation Dep.Groupie.databinding
@@ -78,7 +80,4 @@ dependencies {
 
     implementation Dep.Koin.core
     implementation Dep.Koin.viewmodel
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
 }
