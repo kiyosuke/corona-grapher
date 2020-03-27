@@ -36,3 +36,8 @@ sealed class Location(
         val timelines: Timelines
     ) : Location(id, country, countryCode, countryPopulation, province, lastUpdated, coordinates, latest)
 }
+
+val Location.countryFullName: String get() {
+    if (province.isEmpty()) return country
+    return "$country ($province)"
+}

@@ -2,40 +2,91 @@ package com.kiyosuke.corona_grapher.ui.map
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.marginBottom
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.R
 import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
 import com.kiyosuke.corona_grapher.model.Location
+import com.kiyosuke.corona_grapher.model.countryFullName
 import com.kiyosuke.corona_grapher.util.ext.dataBinding
 import com.kiyosuke.corona_grapher.util.ext.observeNonNull
 import com.kiyosuke.corona_grapher.util.ext.toLatLng
 import org.koin.android.viewmodel.ext.android.viewModel
+import kotlin.math.abs
+import kotlin.math.max
 
-class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
+    GoogleMap.OnMarkerClickListener {
 
     private val viewModel: MapViewModel by viewModel()
     private val binding: MapFragmentBinding by dataBinding()
 
     private var googleMap: GoogleMap? = null
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+
+    private var defaultGoogleLogoMargin = 0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val mapFragment = requireMapFragment()
+        mapFragment.getMapAsync(this)
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+
+        val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(sheet: View, offset: Float) {
+                if (offset > 0f) return
+                val factor = (1 - abs(offset)).let {
+                    if (it.isNaN()) 1f else it
+                }
+
+                val margin = max((bottomSheetBehavior.peekHeight * factor).toInt(), 0)
+                findGoogleLogo()?.let { logo ->
+                    if (defaultGoogleLogoMargin == 0) {
+                        defaultGoogleLogoMargin = logo.marginBottom
+                    }
+                    logo.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        bottomMargin = margin + defaultGoogleLogoMargin
+                    }
+                }
+            }
+
+            override fun onStateChanged(sheet: View, state: Int) {
+                // do nothing
+            }
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
 
         viewModel.locations.observeNonNull(viewLifecycleOwner) { locations ->
             updateLocations(locations)
         }
 
+        viewModel.bottomSheetState.observeNonNull(viewLifecycleOwner) { event ->
+            val state = event.getContentIfNotHandled() ?: return@observeNonNull
+            bottomSheetBehavior.state = state
+        }
+
+        viewModel.sheetInfo.observeNonNull(viewLifecycleOwner) { location ->
+            updateSheetInfo(location)
+        }
+
         viewModel.message.observeNonNull(viewLifecycleOwner) { message ->
 
         }
-
-        val mapFragment =
-            childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
-        mapFragment.getMapAsync(this)
 
         viewModel.refresh()
     }
@@ -43,9 +94,17 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback, GoogleM
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
-        this.googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(40.0, 140.0), 16f))
+        this.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(40.0, 140.0)))
 
         this.googleMap?.setOnMarkerClickListener(this)
+    }
+
+    private fun requireMapFragment(): SupportMapFragment {
+        return childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
+    }
+
+    private fun findGoogleLogo(): ImageView? {
+        return requireMapFragment().view?.findViewWithTag("GoogleWatermark")
     }
 
     private fun updateLocations(locations: List<Location>) {
@@ -67,10 +126,15 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback, GoogleM
         }
     }
 
+    private fun updateSheetInfo(location: Location) {
+        binding.textCountry.text = location.countryFullName
+        binding.textConfirmedCount.text = location.latest.confirmed.toString()
+        binding.textDeathsCount.text = location.latest.deaths.toString()
+        binding.textRecoveredCount.text = location.latest.recovered.toString()
+    }
+
     override fun onMarkerClick(marker: Marker): Boolean {
-        // TODO: マーカーに紐づくLocationの詳細画面Fragmentをボトムシートに表示する
-        // TODO: ボトムシートのpeekHeight部分に国名と感染者数、死亡者数の数値を表示する
         viewModel.onClickedMarker(marker)
-        return false
+        return true
     }
 }

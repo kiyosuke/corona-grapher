@@ -35,5 +35,132 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/content_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottom_sheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sheet_background"
+                android:elevation="8dp"
+                app:behavior_hideable="true"
+                app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guide_peek_height"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="@dimen/bottom_sheet_peek_height" />
+
+                <TextView
+                    android:id="@+id/text_country"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/label_confirmed"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Japan" />
+
+                <TextView
+                    android:id="@+id/label_confirmed"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/confirmed"
+                    android:textColor="@color/darkTextColor"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/label_deaths"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+
+                <TextView
+                    android:id="@+id/label_deaths"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/deaths"
+                    android:textColor="@color/darkTextColor"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@+id/label_recovered"
+                    app:layout_constraintStart_toEndOf="@+id/label_confirmed"
+                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+
+                <TextView
+                    android:id="@+id/label_recovered"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/recovered"
+                    android:textColor="@color/darkTextColor"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/label_deaths"
+                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/text_confirmed_count"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:textColor="@color/confirmed"
+                    android:textStyle="bold"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
+                    app:layout_constraintEnd_toEndOf="@+id/label_confirmed"
+                    app:layout_constraintStart_toStartOf="@+id/label_confirmed"
+                    app:layout_constraintTop_toBottomOf="@+id/label_confirmed"
+                    tools:text="1307" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/text_deaths_count"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:textColor="@color/deaths"
+                    android:textStyle="bold"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
+                    app:layout_constraintEnd_toEndOf="@+id/label_deaths"
+                    app:layout_constraintStart_toStartOf="@+id/label_deaths"
+                    app:layout_constraintTop_toBottomOf="@+id/label_deaths"
+                    tools:text="45" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/text_recovered_count"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:textColor="@color/recovered"
+                    android:textStyle="bold"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
+                    app:layout_constraintEnd_toEndOf="@+id/label_recovered"
+                    app:layout_constraintStart_toStartOf="@+id/label_recovered"
+                    app:layout_constraintTop_toBottomOf="@+id/label_recovered"
+                    tools:text="0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
