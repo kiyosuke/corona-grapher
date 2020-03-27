@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.kiyosuke.corona_grapher.view.CircleFrameLayout
+        android:id="@+id/circle_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:maxLines="1"
+            android:padding="4dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="123" />
+
+    </com.kiyosuke.corona_grapher.view.CircleFrameLayout>
+</layout>

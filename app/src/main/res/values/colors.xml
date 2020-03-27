@@ -12,4 +12,6 @@
     <color name="confirmed">#FFA500</color>
     <color name="recovered">#66CDAA</color>
     <color name="deaths">#DC143C</color>
+
+    <color name="danger">#8B0000</color>
 </resources>
