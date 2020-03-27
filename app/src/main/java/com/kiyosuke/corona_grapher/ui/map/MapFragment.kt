@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.R
+import com.kiyosuke.corona_grapher.common.atUTC
 import com.kiyosuke.corona_grapher.databinding.CircleMarkerLayoutBinding
 import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
 import com.kiyosuke.corona_grapher.model.*
@@ -32,6 +34,7 @@ import com.kiyosuke.corona_grapher.util.ext.dataBinding
 import com.kiyosuke.corona_grapher.util.ext.observeNonNull
 import com.kiyosuke.corona_grapher.util.ext.toLatLng
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -193,7 +196,13 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         }
         val lineData = LineData(confirmedSet, deathsSet, recoveredSet)
 
-        binding.timelineChart.isDragEnabled = false
+        // X軸の日付生成
+        val dates = timelines.confirmed.timeline.keys.map { instant ->
+            instant.atUTC().format(DateTimeFormatter.ofPattern("MM/dd"))
+        }
+        binding.timelineChart.xAxis.valueFormatter = IndexAxisValueFormatter(dates)
+
+        binding.timelineChart.description = null
         binding.timelineChart.setPinchZoom(true)
         binding.timelineChart.setScaleEnabled(true)
         binding.timelineChart.data = lineData
