@@ -9,6 +9,7 @@ apply from: rootProject.file('gradle/android.gradle')
 dependencies {
     implementation project(':data:api')
     implementation project(':data:db')
+    implementation project(':data:memory')
     implementation project(':model')
     implementation project(':common')
 
@@ -17,6 +18,7 @@ dependencies {
     implementation Dep.Kotlin.Coroutines.android
 
     implementation Dep.ThreeTenAbp.core
+    implementation Dep.Timber.core
 
     implementation Dep.Koin.core
 }

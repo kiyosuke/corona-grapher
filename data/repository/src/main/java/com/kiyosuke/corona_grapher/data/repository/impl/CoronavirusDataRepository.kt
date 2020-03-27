@@ -2,6 +2,7 @@ package com.kiyosuke.corona_grapher.data.repository.impl
 
 import com.kiyosuke.corona_grapher.data.api.CoronavirusTrackerApi
 import com.kiyosuke.corona_grapher.data.db.CoronavirusDatabase
+import com.kiyosuke.corona_grapher.data.memory.MemoryCache
 import com.kiyosuke.corona_grapher.data.repository.CoronavirusRepository
 import com.kiyosuke.corona_grapher.data.repository.mapper.toLatest
 import com.kiyosuke.corona_grapher.data.repository.mapper.toLocation
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.map
 
 internal class CoronavirusDataRepository(
     private val api: CoronavirusTrackerApi,
-    private val database: CoronavirusDatabase
+    private val database: CoronavirusDatabase,
+    private val cache: MemoryCache<LocationId, Location.Detail>
 ) : CoronavirusRepository {
 
     override suspend fun refreshLocations() {
@@ -26,9 +28,15 @@ internal class CoronavirusDataRepository(
         return database.locations().map { entities -> entities.toLocations() }
     }
 
-    // TODO: メモリキャッシュ
     override suspend fun location(id: LocationId): Location.Detail {
-        return api.location(id.id).location.toLocation()
+        // メモリキャッシュが有効なら利用
+        val memCache = cache.get(id)?.value
+        if (memCache != null) {
+            return memCache
+        }
+        val data = api.location(id.id).location.toLocation()
+        cache.put(id, data)
+        return data
     }
 
     override suspend fun latest(): Latest {
