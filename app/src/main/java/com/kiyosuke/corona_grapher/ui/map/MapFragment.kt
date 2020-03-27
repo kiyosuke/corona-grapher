@@ -210,6 +210,7 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
 
     override fun onMarkerClick(marker: Marker): Boolean {
         viewModel.onClickedMarker(marker)
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
         return true
     }
 }
