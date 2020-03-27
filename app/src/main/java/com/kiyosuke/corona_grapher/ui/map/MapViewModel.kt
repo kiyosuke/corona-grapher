@@ -4,9 +4,8 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.data.repository.CoronavirusRepository
-import com.kiyosuke.corona_grapher.model.LoadState
-import com.kiyosuke.corona_grapher.model.Location
-import com.kiyosuke.corona_grapher.model.LocationId
+import com.kiyosuke.corona_grapher.model.*
+import com.kiyosuke.corona_grapher.util.ext.requireValue
 import com.kiyosuke.corona_grapher.util.livedata.Event
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,8 +22,8 @@ class MapViewModel(
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
-    private val _sheetInfo = MutableLiveData<Location>()
-    val sheetInfo: LiveData<Location> get() = _sheetInfo
+    private val _sheetInfo = MutableLiveData<MarkerInfo>()
+    val sheetInfo: LiveData<MarkerInfo> get() = _sheetInfo
 
     private val _bottomSheetState = MutableLiveData<Event<Int>>()
     val bottomSheetState: LiveData<Event<Int>> get() = _bottomSheetState
@@ -44,9 +43,16 @@ class MapViewModel(
         }
     }
 
-    fun onClickedMarker(marker: Marker) {
+    fun onMarkerClicked(marker: Marker) {
         val location = marker.tag as? Location ?: return
-        _sheetInfo.value = location
+        val info = MarkerInfo(
+            location.countryFullName,
+            location.latest.confirmed,
+            location.latest.deaths,
+            location.latest.recovered,
+            true
+        )
+        _sheetInfo.value = info
         _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
         requestLocationDetail(location.id)
     }
@@ -58,6 +64,19 @@ class MapViewModel(
                 _locationDetail.value = LoadState.Loaded(repo.location(locationId))
             } catch (e: Exception) {
                 _locationDetail.value = LoadState.Error(e)
+            }
+        }
+    }
+
+    fun onMapClicked() {
+        viewModelScope.launch {
+            try {
+                val latest = repo.latest()
+                val info = MarkerInfo("World", latest.confirmed, latest.deaths, latest.recovered, false)
+                _sheetInfo.value = info
+                _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
+            } catch (e: Exception) {
+
             }
         }
     }
