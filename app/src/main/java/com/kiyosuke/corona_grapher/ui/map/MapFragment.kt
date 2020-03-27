@@ -38,7 +38,6 @@ import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.abs
 import kotlin.math.max
 
-@ExperimentalStdlibApi
 class MapFragment : Fragment(R.layout.map_fragment),
     OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener,
@@ -87,7 +86,14 @@ class MapFragment : Fragment(R.layout.map_fragment),
             }
 
             override fun onStateChanged(sheet: View, state: Int) {
-                // do nothing
+                val rotation = when (state) {
+                    BottomSheetBehavior.STATE_EXPANDED -> 0f
+                    BottomSheetBehavior.STATE_COLLAPSED -> 180f
+                    BottomSheetBehavior.STATE_HIDDEN -> 180f
+                    else -> return
+                }
+                binding.expandIcon.animate().rotationX(rotation).start()
+
             }
         }
 
@@ -194,7 +200,9 @@ class MapFragment : Fragment(R.layout.map_fragment),
         binding.textConfirmedCount.text = markerInfo.confirmed.toString()
         binding.textDeathsCount.text = markerInfo.deaths.toString()
         binding.textRecoveredCount.text = markerInfo.recovered.toString()
+
         binding.nestedScrollView.isVisible = markerInfo.hasDescription
+        binding.expandIcon.isVisible = markerInfo.hasDescription
     }
 
     private fun updateSheetCharts(state: LoadState<Location.Detail>) {
