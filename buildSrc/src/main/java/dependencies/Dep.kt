@@ -90,4 +90,8 @@ object Dep {
     object Timber {
         val core = "com.jakewharton.timber:timber:4.7.1"
     }
+
+    object MPAndroidChart {
+        val core = "com.github.PhilJay:MPAndroidChart:v3.1.0"
+    }
 }
