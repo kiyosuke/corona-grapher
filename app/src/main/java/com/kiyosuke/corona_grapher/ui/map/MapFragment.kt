@@ -7,9 +7,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
+import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -22,8 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.R
 import com.kiyosuke.corona_grapher.databinding.CircleMarkerLayoutBinding
 import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
-import com.kiyosuke.corona_grapher.model.Location
-import com.kiyosuke.corona_grapher.model.countryFullName
+import com.kiyosuke.corona_grapher.model.*
 import com.kiyosuke.corona_grapher.util.color.Color
 import com.kiyosuke.corona_grapher.util.ext.dataBinding
 import com.kiyosuke.corona_grapher.util.ext.observeNonNull
@@ -94,6 +97,10 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
             updateSheetInfo(location)
         }
 
+        viewModel.locationDetail.observeNonNull(viewLifecycleOwner) { state ->
+            updateSheetTimelineChart(state)
+        }
+
         viewModel.message.observeNonNull(viewLifecycleOwner) { message ->
 
         }
@@ -162,6 +169,43 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         binding.textConfirmedCount.text = location.latest.confirmed.toString()
         binding.textDeathsCount.text = location.latest.deaths.toString()
         binding.textRecoveredCount.text = location.latest.recovered.toString()
+    }
+
+    private fun updateSheetTimelineChart(state: LoadState<Location.Detail>) {
+        if (state.isLoading) {
+            binding.timelineChart.clear()
+        }
+        binding.detailProgressbar.isVisible = state.isLoading
+        binding.timelineChart.isVisible = state.isLoading.not()
+
+        val timelines = state.getValueOrNull()?.timelines ?: return
+        val confirmedSet = LineDataSet(createEntries(timelines.confirmed), getString(R.string.confirmed_count)).apply {
+            this.color = ContextCompat.getColor(requireContext(), R.color.confirmed)
+            setDrawCircles(false)
+        }
+        val deathsSet = LineDataSet(createEntries(timelines.deaths), getString(R.string.deaths_count)).apply {
+            this.color = ContextCompat.getColor(requireContext(), R.color.deaths)
+            setDrawCircles(false)
+        }
+        val recoveredSet = LineDataSet(createEntries(timelines.recovered), getString(R.string.recovered_count)).apply {
+            this.color = ContextCompat.getColor(requireContext(), R.color.recovered)
+            setDrawCircles(false)
+        }
+        val lineData = LineData(confirmedSet, deathsSet, recoveredSet)
+
+        binding.timelineChart.isDragEnabled = false
+        binding.timelineChart.setPinchZoom(true)
+        binding.timelineChart.setScaleEnabled(true)
+        binding.timelineChart.data = lineData
+        binding.timelineChart.invalidate()
+    }
+
+    private fun createEntries(timeline: Timeline): List<Entry> {
+        val result = mutableListOf<Entry>()
+        timeline.timeline.values.forEachIndexed { index, l ->
+            result += Entry(index.toFloat(), l.toFloat())
+        }
+        return result
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {

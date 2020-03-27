@@ -4,7 +4,9 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.data.repository.CoronavirusRepository
+import com.kiyosuke.corona_grapher.model.LoadState
 import com.kiyosuke.corona_grapher.model.Location
+import com.kiyosuke.corona_grapher.model.LocationId
 import com.kiyosuke.corona_grapher.util.livedata.Event
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -27,6 +29,9 @@ class MapViewModel(
     private val _bottomSheetState = MutableLiveData<Event<Int>>()
     val bottomSheetState: LiveData<Event<Int>> get() = _bottomSheetState
 
+    private val _locationDetail = MutableLiveData<LoadState<Location.Detail>>()
+    val locationDetail: LiveData<LoadState<Location.Detail>> get() = _locationDetail
+
     fun refresh() {
         _bottomSheetState.value = Event(BottomSheetBehavior.STATE_HIDDEN)
         viewModelScope.launch {
@@ -43,5 +48,17 @@ class MapViewModel(
         val location = marker.tag as? Location ?: return
         _sheetInfo.value = location
         _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
+        requestLocationDetail(location.id)
+    }
+
+    private fun requestLocationDetail(locationId: LocationId) {
+        viewModelScope.launch {
+            _locationDetail.value = LoadState.Loading
+            try {
+                _locationDetail.value = LoadState.Loaded(repo.location(locationId))
+            } catch (e: Exception) {
+                _locationDetail.value = LoadState.Error(e)
+            }
+        }
     }
 }

@@ -48,7 +48,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom_sheet"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@drawable/sheet_background"
                 android:elevation="8dp"
                 app:behavior_hideable="true"
@@ -61,6 +61,25 @@
                     android:layout_height="0dp"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="@dimen/bottom_sheet_peek_height" />
+
+                <ProgressBar
+                    android:id="@+id/detail_progressbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/bottom_sheet_peek_height"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/timeline_chart"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/bottom_sheet_peek_height"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/text_country"
