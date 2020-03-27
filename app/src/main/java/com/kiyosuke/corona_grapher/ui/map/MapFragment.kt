@@ -39,8 +39,10 @@ import kotlin.math.abs
 import kotlin.math.max
 
 @ExperimentalStdlibApi
-class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener {
+class MapFragment : Fragment(R.layout.map_fragment),
+    OnMapReadyCallback,
+    GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMapClickListener {
 
     private val viewModel: MapViewModel by viewModel()
     private val binding: MapFragmentBinding by dataBinding()
@@ -100,8 +102,8 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
             bottomSheetBehavior.state = state
         }
 
-        viewModel.sheetInfo.observeNonNull(viewLifecycleOwner) { location ->
-            updateSheetInfo(location)
+        viewModel.sheetInfo.observeNonNull(viewLifecycleOwner) { info ->
+            updateSheetInfo(info)
         }
 
         viewModel.locationDetail.observeNonNull(viewLifecycleOwner) { state ->
@@ -131,6 +133,7 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         this.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(40.0, 140.0)))
 
         this.googleMap?.setOnMarkerClickListener(this)
+        this.googleMap?.setOnMapClickListener(this)
     }
 
     private fun requireMapFragment(): SupportMapFragment {
@@ -186,11 +189,12 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
         return circleView.circleFrame.drawToBitmap()
     }
 
-    private fun updateSheetInfo(location: Location) {
-        binding.textCountry.text = location.countryFullName
-        binding.textConfirmedCount.text = location.latest.confirmed.toString()
-        binding.textDeathsCount.text = location.latest.deaths.toString()
-        binding.textRecoveredCount.text = location.latest.recovered.toString()
+    private fun updateSheetInfo(markerInfo: MarkerInfo) {
+        binding.textCountry.text = markerInfo.locationName
+        binding.textConfirmedCount.text = markerInfo.confirmed.toString()
+        binding.textDeathsCount.text = markerInfo.deaths.toString()
+        binding.textRecoveredCount.text = markerInfo.recovered.toString()
+        binding.nestedScrollView.isVisible = markerInfo.hasDescription
     }
 
     private fun updateSheetCharts(state: LoadState<Location.Detail>) {
@@ -256,8 +260,12 @@ class MapFragment : Fragment(R.layout.map_fragment), OnMapReadyCallback,
     private fun getColor(@ColorRes resId: Int) = requireContext().getColorCompat(resId)
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        viewModel.onClickedMarker(marker)
+        viewModel.onMarkerClicked(marker)
         googleMap?.animateCamera(CameraUpdateFactory.newLatLng(marker.position))
         return true
+    }
+
+    override fun onMapClick(latlng: LatLng) {
+        viewModel.onMapClicked()
     }
 }
