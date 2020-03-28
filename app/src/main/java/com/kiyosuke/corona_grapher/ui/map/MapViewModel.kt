@@ -31,6 +31,9 @@ class MapViewModel(
     private val _locationDetail = MutableLiveData<LoadState<Location.Detail>>()
     val locationDetail: LiveData<LoadState<Location.Detail>> get() = _locationDetail
 
+    private val _markerType = MutableLiveData(MarkerType.CONFIRMED)
+    val markerType: LiveData<MarkerType> get() = _markerType
+
     fun refresh() {
         _bottomSheetState.value = Event(BottomSheetBehavior.STATE_HIDDEN)
         viewModelScope.launch {
@@ -41,6 +44,10 @@ class MapViewModel(
                 Timber.e(e)
             }
         }
+    }
+
+    fun updateMarkerType(markerType: MarkerType) {
+        _markerType.value = markerType
     }
 
     fun onMarkerClicked(marker: Marker) {
@@ -76,7 +83,7 @@ class MapViewModel(
                 _sheetInfo.value = info
                 _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
             } catch (e: Exception) {
-
+                Timber.e(e)
             }
         }
     }

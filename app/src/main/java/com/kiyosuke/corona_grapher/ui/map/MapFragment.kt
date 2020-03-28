@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
@@ -29,10 +28,7 @@ import com.kiyosuke.corona_grapher.databinding.CircleMarkerLayoutBinding
 import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
 import com.kiyosuke.corona_grapher.model.*
 import com.kiyosuke.corona_grapher.util.color.Color
-import com.kiyosuke.corona_grapher.util.ext.dataBinding
-import com.kiyosuke.corona_grapher.util.ext.getColorCompat
-import com.kiyosuke.corona_grapher.util.ext.observeNonNull
-import com.kiyosuke.corona_grapher.util.ext.toLatLng
+import com.kiyosuke.corona_grapher.util.ext.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.abs
@@ -93,14 +89,22 @@ class MapFragment : Fragment(R.layout.map_fragment),
                     else -> return
                 }
                 binding.expandIcon.animate().rotationX(rotation).start()
-
             }
         }
 
         bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
 
+        binding.markerTypeCardView.setOnClickListener {
+            MarkerTypeDialogFragment().show(childFragmentManager, "MARKER_TYPE")
+        }
+
         viewModel.locations.observeNonNull(viewLifecycleOwner) { locations ->
-            updateLocations(locations)
+            updateLocations(viewModel.markerType.requireValue(), locations)
+        }
+
+        viewModel.markerType.observeNonNull(viewLifecycleOwner) { markerType ->
+            val locations = viewModel.locations.value ?: return@observeNonNull
+            updateLocations(markerType, locations)
         }
 
         viewModel.bottomSheetState.observeNonNull(viewLifecycleOwner) { event ->
@@ -150,19 +154,23 @@ class MapFragment : Fragment(R.layout.map_fragment),
         return requireMapFragment().view?.findViewWithTag("GoogleWatermark")
     }
 
-    private fun updateLocations(locations: List<Location>) {
+    private fun updateLocations(markerType: MarkerType, locations: List<Location>) {
         this.googleMap?.clear()
-        // TODO: 感染者数をマーカーに表示させるためのアイコンを用意（数値を描画できるDrawable?）
-        // TODO: 感染者数に応じてマーカーアイコンの大きさと色を変更する
         locations.forEach { location ->
-            val options = createMarkerOptions(location)
+            val options = createMarkerOptions(markerType, location)
             val marker = this.googleMap?.addMarker(options)
             marker?.tag = location
         }
     }
 
-    private fun createMarkerOptions(location: Location): MarkerOptions {
-        val icon = createMarkerIcon(location.latest.confirmed)
+    private fun createMarkerOptions(markerType: MarkerType, location: Location): MarkerOptions {
+        val data = when (markerType) {
+            MarkerType.CONFIRMED -> Color(getColor(R.color.danger)) to location.latest.confirmed
+            MarkerType.DEATHS -> Color(getColor(R.color.danger)) to location.latest.deaths
+            MarkerType.RECOVERED -> Color(getColor(R.color.safety)) to location.latest.recovered
+        }
+        val (baseColor, count) = data
+        val icon = createMarkerIcon(baseColor, count)
         return MarkerOptions().apply {
             position(location.coordinates.toLatLng())
             title(location.country)
@@ -171,14 +179,12 @@ class MapFragment : Fragment(R.layout.map_fragment),
         }
     }
 
-    private fun createMarkerIcon(confirmedCount: Long): Bitmap {
-        // FIXME: 一つの色をベースに明るさを変えて描画しているけど見た目が微妙。。
-        val baseColor = Color(ContextCompat.getColor(requireContext(), R.color.danger))
-        circleView.textCount.text = confirmedCount.toString()
+    private fun createMarkerIcon(baseColor: Color, count: Long): Bitmap {
+        circleView.textCount.text = count.toString()
         val color = when {
-            confirmedCount >= 10000 -> baseColor.darker
-            confirmedCount >= 1000 -> baseColor
-            confirmedCount >= 100 -> baseColor.brighter
+            count >= 10000 -> baseColor.darker
+            count >= 1000 -> baseColor
+            count >= 100 -> baseColor.brighter
             else -> baseColor.brighter.brighter
         }
         circleView.circleFrame.circleColor = color.color
