@@ -56,7 +56,9 @@ dependencies {
     implementation Dep.AndroidX.appcompat
     implementation Dep.AndroidX.coreKtx
     implementation Dep.AndroidX.constraintLayout
+    implementation Dep.AndroidX.fragmentKtx
     implementation Dep.AndroidX.coordinatorLayout
+    implementation Dep.AndroidX.cardview
     implementation Dep.AndroidX.materialComponent
     implementation Dep.AndroidX.recyclerView
     implementation Dep.Groupie.core

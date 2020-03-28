@@ -12,6 +12,7 @@ object Dep {
         val constraintLayout = "androidx.constraintlayout:constraintlayout:1.1.3"
         val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
         val coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+        val cardview = "androidx.cardview:cardview:1.0.0"
         val materialComponent = "com.google.android.material:material:1.1.0"
         val appcompat = "androidx.appcompat:appcompat:1.1.0"
         val coreKtx = "androidx.core:core-ktx:1.2.0"
