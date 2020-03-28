@@ -15,4 +15,5 @@
     <color name="deaths">#DC143C</color>
 
     <color name="danger">#8B0000</color>
+    <color name="safety">#006400</color>
 </resources>
