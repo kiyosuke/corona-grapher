@@ -114,7 +114,8 @@
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/timeline_bar_chart"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/graph_height" />
+                            android:layout_height="@dimen/graph_height"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
@@ -139,11 +140,35 @@
                     android:maxLines="1"
                     android:textColor="@color/black"
                     android:textSize="20sp"
-                    app:layout_constraintBottom_toTopOf="@+id/label_confirmed"
                     app:layout_constraintEnd_toStartOf="@+id/expand_icon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Japan" />
+
+                <TextView
+                    android:id="@+id/label_updated_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/last_updated_date"
+                    android:textColor="@color/darkTextColor"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+
+                <TextView
+                    android:id="@+id/text_updated_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="@color/darkTextColor"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/label_updated_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/label_updated_date"
+                    app:layout_constraintTop_toTopOf="@+id/label_updated_date"
+                    tools:text="2020/03/28 12:42:52" />
 
                 <TextView
                     android:id="@+id/label_confirmed"
@@ -156,7 +181,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@+id/label_deaths"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+                    app:layout_constraintTop_toBottomOf="@+id/label_updated_date" />
 
                 <TextView
                     android:id="@+id/label_deaths"
@@ -169,7 +194,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@+id/label_recovered"
                     app:layout_constraintStart_toEndOf="@+id/label_confirmed"
-                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+                    app:layout_constraintTop_toBottomOf="@+id/label_updated_date" />
 
                 <TextView
                     android:id="@+id/label_recovered"
@@ -182,7 +207,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/label_deaths"
-                    app:layout_constraintTop_toBottomOf="@+id/text_country" />
+                    app:layout_constraintTop_toBottomOf="@+id/label_updated_date" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/text_confirmed_count"
@@ -191,6 +216,7 @@
                     android:gravity="center"
                     android:textColor="@color/confirmed"
                     android:textStyle="bold"
+                    app:autoSizeMaxTextSize="@dimen/max_count_text_size"
                     app:autoSizeTextType="uniform"
                     app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
                     app:layout_constraintEnd_toEndOf="@+id/label_confirmed"
@@ -205,6 +231,7 @@
                     android:gravity="center"
                     android:textColor="@color/deaths"
                     android:textStyle="bold"
+                    app:autoSizeMaxTextSize="@dimen/max_count_text_size"
                     app:autoSizeTextType="uniform"
                     app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
                     app:layout_constraintEnd_toEndOf="@+id/label_deaths"
@@ -219,12 +246,19 @@
                     android:gravity="center"
                     android:textColor="@color/recovered"
                     android:textStyle="bold"
+                    app:autoSizeMaxTextSize="@dimen/max_count_text_size"
                     app:autoSizeTextType="uniform"
                     app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
                     app:layout_constraintEnd_toEndOf="@+id/label_recovered"
                     app:layout_constraintStart_toStartOf="@+id/label_recovered"
                     app:layout_constraintTop_toBottomOf="@+id/label_recovered"
                     tools:text="0" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/updated_date_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="text_updated_date,label_updated_date" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

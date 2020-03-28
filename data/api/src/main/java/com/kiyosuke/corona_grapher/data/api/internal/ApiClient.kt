@@ -4,6 +4,7 @@ import com.kiyosuke.corona_grapher.data.api.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.threeten.bp.Instant
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -29,6 +30,11 @@ internal object ApiClient {
             writeTimeout(30 * 1000, TimeUnit.MILLISECONDS)
             connectTimeout(30 * 1000, TimeUnit.MILLISECONDS)
             followRedirects(false)
+
+            val logging = HttpLoggingInterceptor().apply {
+                setLevel(HttpLoggingInterceptor.Level.BODY)
+            }
+            addInterceptor(logging)
         }
         okHttpClient = clientBuilder.build()
 

@@ -9,4 +9,6 @@
     <string name="confirmed">感染者</string>
     <string name="deaths">死亡者</string>
     <string name="recovered">回復者</string>
+
+    <string name="last_updated_date">最終更新日: </string>
 </resources>

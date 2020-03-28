@@ -20,6 +20,7 @@ dependencies {
     implementation Dep.Kotlin.Coroutines.android
 
     implementation Dep.OkHttp.core
+    implementation Dep.OkHttp.logging
 
     implementation Dep.Retrofit.core
     implementation Dep.Retrofit.moshi

@@ -63,12 +63,13 @@ object Dep {
     }
 
     object OkHttp {
-        val version = "4.2.2"
+        val version = "4.4.0"
         val core = "com.squareup.okhttp3:okhttp:$version"
+        val logging = "com.squareup.okhttp3:logging-interceptor:$version"
     }
 
     object Retrofit {
-        val version = "2.6.2"
+        val version = "2.8.1"
         val core = "com.squareup.retrofit2:retrofit:$version"
         val moshi = "com.squareup.retrofit2:converter-moshi:$version"
     }

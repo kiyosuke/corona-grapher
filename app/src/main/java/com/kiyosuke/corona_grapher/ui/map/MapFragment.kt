@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kiyosuke.corona_grapher.R
+import com.kiyosuke.corona_grapher.common.atSystemDefault
 import com.kiyosuke.corona_grapher.common.atUTC
 import com.kiyosuke.corona_grapher.databinding.CircleMarkerLayoutBinding
 import com.kiyosuke.corona_grapher.databinding.MapFragmentBinding
@@ -206,6 +207,12 @@ class MapFragment : Fragment(R.layout.map_fragment),
         binding.textConfirmedCount.text = markerInfo.confirmed.toString()
         binding.textDeathsCount.text = markerInfo.deaths.toString()
         binding.textRecoveredCount.text = markerInfo.recovered.toString()
+        binding.updatedDateGroup.isVisible = markerInfo.lastUpdated != null
+        markerInfo.lastUpdated?.let { lastUpdated ->
+            binding.textUpdatedDate.text = lastUpdated
+                .atSystemDefault()
+                .format(UPDATED_DATE_FORMATTER)
+        }
 
         binding.nestedScrollView.isVisible = markerInfo.hasDescription
         binding.expandIcon.isVisible = markerInfo.hasDescription
@@ -281,5 +288,9 @@ class MapFragment : Fragment(R.layout.map_fragment),
 
     override fun onMapClick(latlng: LatLng) {
         viewModel.onMapClicked()
+    }
+
+    companion object {
+        private val UPDATED_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
     }
 }
