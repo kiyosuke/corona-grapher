@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="bottom_sheet_peek_height">100dp</dimen>
+    <dimen name="bottom_sheet_peek_height">120dp</dimen>
 
     <dimen name="graph_height">360dp</dimen>
 

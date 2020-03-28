@@ -53,11 +53,12 @@ class MapViewModel(
     fun onMarkerClicked(marker: Marker) {
         val location = marker.tag as? Location ?: return
         val info = MarkerInfo(
-            location.countryFullName,
-            location.latest.confirmed,
-            location.latest.deaths,
-            location.latest.recovered,
-            true
+            locationName = location.countryFullName,
+            confirmed = location.latest.confirmed,
+            deaths = location.latest.deaths,
+            recovered = location.latest.recovered,
+            lastUpdated = location.lastUpdated,
+            hasDescription = true
         )
         _sheetInfo.value = info
         _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
@@ -79,7 +80,14 @@ class MapViewModel(
         viewModelScope.launch {
             try {
                 val latest = repo.latest()
-                val info = MarkerInfo("World", latest.confirmed, latest.deaths, latest.recovered, false)
+                val info = MarkerInfo(
+                    locationName = "World",
+                    confirmed = latest.confirmed,
+                    deaths = latest.deaths,
+                    recovered = latest.recovered,
+                    lastUpdated = null,
+                    hasDescription = false
+                )
                 _sheetInfo.value = info
                 _bottomSheetState.value = Event(BottomSheetBehavior.STATE_COLLAPSED)
             } catch (e: Exception) {
