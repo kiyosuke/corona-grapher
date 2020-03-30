@@ -6,7 +6,7 @@ object Dep {
         val android = "com.android.tools.build:gradle:3.5.3"
         val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Kotlin.version}"
         val safeArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:${AndroidX.Navigation.version}"
-        val deproygate = "com.deploygate:gradle:2.1.0"
+        val deploygate = "com.deploygate:gradle:2.1.0"
     }
 
     object AndroidX {
