@@ -8,7 +8,9 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
-apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'androidx.navigation.safeargs.kotlin'
+
+apply plugin: 'deploygate'
 
 android {
     compileSdkVersion 29
