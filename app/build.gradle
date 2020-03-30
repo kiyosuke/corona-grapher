@@ -14,6 +14,16 @@ apply plugin: 'deploygate'
 
 android {
     compileSdkVersion 29
+
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug.keystore')
+            storePassword 'android'
+        }
+    }
+
     defaultConfig {
         applicationId "com.kiyosuke.corona_grapher"
         minSdkVersion 21
@@ -24,6 +34,7 @@ android {
     }
     buildTypes {
         debug {
+            signingConfig signingConfigs.debug
             resValue("string", "google_map_api_key", "AIzaSyDImU_xlYq0TjrRIkOW4-_2G6rQ3B3WrnE")
         }
         release {
