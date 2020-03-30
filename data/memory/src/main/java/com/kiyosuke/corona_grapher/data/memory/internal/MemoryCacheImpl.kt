@@ -6,9 +6,9 @@ import com.kiyosuke.corona_grapher.data.memory.MemoryCache
 import com.kiyosuke.corona_grapher.data.memory.Expiration
 import com.kiyosuke.corona_grapher.data.memory.Timestamp
 
-class MemoryCacheImpl<K, V>(
+internal class MemoryCacheImpl<K, V>(
     private val expiration: Expiration,
-    private val maxSize: Int
+    maxSize: Int
 ) : MemoryCache<K, V> {
 
     private val cache: LruCache<K, Cache<V>> = LruCache<K, Cache<V>>(maxSize)

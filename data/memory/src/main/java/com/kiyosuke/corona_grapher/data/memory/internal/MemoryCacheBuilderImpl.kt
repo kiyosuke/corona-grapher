@@ -3,7 +3,7 @@ package com.kiyosuke.corona_grapher.data.memory.internal
 import com.kiyosuke.corona_grapher.data.memory.Expiration
 import com.kiyosuke.corona_grapher.data.memory.MemoryCache
 
-class MemoryCacheBuilderImpl<K, V> : MemoryCache.Builder<K, V> {
+internal class MemoryCacheBuilderImpl<K, V> : MemoryCache.Builder<K, V> {
     private var expiration = Expiration.bySeconds(300)
     private var maxSize = 10
 
