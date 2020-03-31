@@ -114,8 +114,7 @@
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/timeline_bar_chart"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/graph_height"
-                            android:visibility="gone" />
+                            android:layout_height="@dimen/graph_height" />
 
                     </LinearLayout>
 

@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -130,12 +131,13 @@ class MapFragment : Fragment(R.layout.map_fragment),
 
     private fun setupLineChart() {
         binding.timelineChart.description.isEnabled = false
-        binding.timelineChart.setPinchZoom(true)
-        binding.timelineChart.setScaleEnabled(true)
+        binding.timelineChart.setTouchEnabled(false)
     }
 
     private fun setupBarChart() {
         binding.timelineBarChart.description.isEnabled = false
+        binding.timelineBarChart.setTouchEnabled(false)
+        binding.timelineBarChart.axisLeft.mAxisMinimum = 0f
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -228,7 +230,7 @@ class MapFragment : Fragment(R.layout.map_fragment),
 
         val detail = state.getValueOrNull() ?: return
         updateTimelineChart(detail.timelines)
-        updateTimelineBarChart(detail.timelines.confirmed)
+        updateTimelineBarChart(detail.timelines)
     }
 
     private fun updateTimelineChart(timelines: Timelines) {
@@ -251,7 +253,7 @@ class MapFragment : Fragment(R.layout.map_fragment),
 
         // X軸の日付生成
         val dates = timelines.confirmed.timeline.keys.map { instant ->
-            instant.atUTC().format(DateTimeFormatter.ofPattern("MM/dd"))
+            instant.atUTC().format(DATE_FORMATTER)
         }
         binding.timelineChart.xAxis.valueFormatter = IndexAxisValueFormatter(dates)
 
@@ -274,8 +276,39 @@ class MapFragment : Fragment(R.layout.map_fragment),
         }
     }
 
-    private fun updateTimelineBarChart(timeline: Timeline) {
+    private fun updateTimelineBarChart(timelines: Timelines) {
+        binding.timelineBarChart.apply {
+            xAxis.apply {
+                val dates = timelines.confirmed.timeline.keys.map {
+                    it.atUTC().format(DATE_FORMATTER)
+                }.dropLast(1)
+                this.valueFormatter = IndexAxisValueFormatter(dates)
+                this.position = XAxis.XAxisPosition.BOTTOM
+                this.setDrawGridLines(true)
+            }
+        }
+        val confirmedSet = createBarDataSet(
+            createBarEntries(timelines.confirmed),
+            getString(R.string.confirmed_count),
+            getColor(R.color.confirmed)
+        )
 
+        binding.timelineBarChart.data = BarData(confirmedSet)
+        binding.timelineBarChart.invalidate()
+    }
+
+    private fun createBarEntries(timeline: Timeline): List<BarEntry> {
+        val diffs = timeline.timeline.values.zipWithNext { first, second -> second - first }
+        return diffs.mapIndexed { index, count ->
+            BarEntry(index.toFloat(), count.toFloat())
+        }
+    }
+
+    private fun createBarDataSet(entries: List<BarEntry>, label: String, color: Int): BarDataSet {
+        return BarDataSet(entries, label).apply {
+            this.color = color
+            setDrawValues(false)
+        }
     }
 
     private fun getColor(@ColorRes resId: Int) = requireContext().getColorCompat(resId)
@@ -292,5 +325,6 @@ class MapFragment : Fragment(R.layout.map_fragment),
 
     companion object {
         private val UPDATED_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd")
     }
 }
