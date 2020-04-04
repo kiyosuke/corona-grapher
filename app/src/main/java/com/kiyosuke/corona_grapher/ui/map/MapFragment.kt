@@ -170,7 +170,6 @@ class MapFragment : Fragment(R.layout.map_fragment),
         val data = when (markerType) {
             MarkerType.CONFIRMED -> Color(getColor(R.color.danger)) to location.latest.confirmed
             MarkerType.DEATHS -> Color(getColor(R.color.danger)) to location.latest.deaths
-            MarkerType.RECOVERED -> Color(getColor(R.color.safety)) to location.latest.recovered
         }
         val (baseColor, count) = data
         val icon = createMarkerIcon(baseColor, count)
@@ -208,7 +207,6 @@ class MapFragment : Fragment(R.layout.map_fragment),
         binding.textCountry.text = markerInfo.locationName
         binding.textConfirmedCount.text = markerInfo.confirmed.toString()
         binding.textDeathsCount.text = markerInfo.deaths.toString()
-        binding.textRecoveredCount.text = markerInfo.recovered.toString()
         binding.updatedDateGroup.isVisible = markerInfo.lastUpdated != null
         markerInfo.lastUpdated?.let { lastUpdated ->
             binding.textUpdatedDate.text = lastUpdated
@@ -244,12 +242,7 @@ class MapFragment : Fragment(R.layout.map_fragment),
             getString(R.string.deaths_count),
             getColor(R.color.deaths)
         )
-        val recoveredSet = createLineSet(
-            createTimelineEntries(timelines.recovered),
-            getString(R.string.recovered_count),
-            getColor(R.color.recovered)
-        )
-        val lineData = LineData(confirmedSet, deathsSet, recoveredSet)
+        val lineData = LineData(confirmedSet, deathsSet)
 
         // X軸の日付生成
         val dates = timelines.confirmed.timeline.keys.map { instant ->

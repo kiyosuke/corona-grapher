@@ -204,6 +204,7 @@
                     android:text="@string/recovered"
                     android:textColor="@color/darkTextColor"
                     android:textSize="16sp"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/label_deaths"
                     app:layout_constraintTop_toBottomOf="@+id/label_updated_date" />
@@ -251,6 +252,7 @@
                     android:gravity="center"
                     android:textColor="@color/recovered"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     app:autoSizeMaxTextSize="@dimen/max_count_text_size"
                     app:autoSizeTextType="uniform"
                     app:layout_constraintBottom_toTopOf="@+id/guide_peek_height"
